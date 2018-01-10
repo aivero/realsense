@@ -219,7 +219,7 @@ namespace realsense_ros_camera
                   }
                 }
                 if (_dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER) != _serial_no){
-                  ROS_ERROR("Requested RealSense with serial %s is not attached", _serial_no)
+                  ROS_ERROR("Requested RealSense with serial %s is not attached", _serial_no);
                   ros::shutdown();
                 }
 
