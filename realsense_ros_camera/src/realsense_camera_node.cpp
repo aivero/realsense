@@ -211,9 +211,18 @@ namespace realsense_ros_camera
                     exit(1);
                 }
 
-                // Take the first device in the list.
-                // TODO: Add an ability to get the specific device to work with from outside
-                _dev = list.front();
+                // Take the device with a serial number specified by serial_no on the parameter server within the same namespace
+                for (auto device : list){
+                  if (device.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER) == _serial_no) {
+                    _dev = device;
+                    break;
+                  }
+                }
+                if (_dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER) != _serial_no){
+                  ROS_ERROR("Requested RealSense with serial %s is not attached", _serial_no)
+                  ros::shutdown();
+                }
+
                 _ctx->set_devices_changed_callback([this](rs2::event_information& info)
                 {
                     if (info.was_removed(_dev))
@@ -227,7 +236,6 @@ namespace realsense_ros_camera
                 auto camera_name = _dev.get_info(RS2_CAMERA_INFO_NAME);
                 ROS_INFO_STREAM("Device Name: " << camera_name);
 
-                _serial_no = _dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
                 ROS_INFO_STREAM("Device Serial No: " << _serial_no);
 
                 auto fw_ver = _dev.get_info(RS2_CAMERA_INFO_FIRMWARE_VERSION);
